@@ -5,8 +5,6 @@ import os
 
 connection = sql.connect(host="127.0.0.1", user="root", password="", database="aula01")
 
-cursor = connection.cursor()
-
 app = Flask(__name__)
 
 app.config["STATIC_FOLDER"] = "static"
@@ -41,10 +39,13 @@ def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
+        cursor = connection.cursor()
         cursor.execute(
             f"SELECT * FROM usuarios WHERE nome = '{username}' AND senha = '{password}'"
         )
         user = cursor.fetchall()
+        connection.commit()
+        cursor.close()
         if user:
             return redirect("/list")
         else:
@@ -57,9 +58,12 @@ def register():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
+        cursor = connection.cursor()
         cursor.execute(
             f"INSERT INTO usuarios (nome, senha) VALUES ('{username}', '{password}')"
         )
+        connection.commit()
+        cursor.close()
         return redirect("/login")
 
 
